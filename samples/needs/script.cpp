@@ -348,6 +348,13 @@ int currentStaminaLevel = 7;
 int currentDeadeyeLevel = 7;
 int currentHealthLevel = 7;
 
+float temperature_food_drop;
+
+float temperature_food_drop1 = GetPrivateProfileInt("CORES", "FOOD_CORE_RATE_TEMPERATURE1", 15, ".\\needs.ini") / 10;
+float temperature_food_drop2 = GetPrivateProfileInt("CORES", "FOOD_CORE_RATE_TEMPERATURE2", 20, ".\\needs.ini") / 10;
+float temperature_food_drop3 = GetPrivateProfileInt("CORES", "FOOD_CORE_RATE_TEMPERATURE3", 30, ".\\needs.ini") / 10;
+
+
 void foodCore(int cold_core, float menuX, float menuY, float sizeX, float sizeY)
 {
 	//drawText((char*)title, menuX + 0.13f, 0.076f, 255, 255, 255, 255, true, 0.5f, 0.5f);
@@ -366,10 +373,34 @@ void foodCore(int cold_core, float menuX, float menuY, float sizeX, float sizeY)
 		Misc::drawSprite("rpg_textures", "rpg_core_background", menuX, menuY, 0.025 + sizeX, 0.04f + sizeY, 0, 0, 0, 0, 220);
 
 
+		
 
 
 
-		Misc::drawSprite("rpg_textures", "rpg_overfed", menuX, menuY, 0.025 + sizeX, 0.04f + sizeY, 0, 255, 255, 255, 230);
+		if (getTemperaturePointsNeeded() < 6.0) {
+			Misc::drawSprite("rpg_textures", "rpg_overfed", menuX, menuY, 0.025 + sizeX, 0.04f + sizeY, 0, 255, 255, 255, 230);
+			temperature_food_drop = temperature_food_drop1;
+		}
+
+		if (getTemperaturePointsNeeded() == 6.0) {
+			Misc::drawSprite("rpg_textures", "rpg_overfed", menuX, menuY, 0.025 + sizeX, 0.04f + sizeY, 0, 255, 255, 0, 230);
+			temperature_food_drop = temperature_food_drop1;
+			//temperature_food_drop = temperature_drink_drop1;
+		}
+
+		if (getTemperaturePointsNeeded() == 6.5) {
+			Misc::drawSprite("rpg_textures", "rpg_overfed", menuX, menuY, 0.025 + sizeX, 0.04f + sizeY, 0, 229, 148, 0, 230);
+			temperature_food_drop = temperature_food_drop2;
+			//temperature_food_drop = temperature_drink_drop1;
+		}
+
+		if (getTemperaturePointsNeeded() >= 7.0) {
+			Misc::drawSprite("rpg_textures", "rpg_overfed", menuX, menuY, 0.025 + sizeX, 0.04f + sizeY, 0, 250, 0, 80, 230);
+			temperature_food_drop = temperature_food_drop3;
+			//temperature_food_drop = temperature_drink_drop1;
+		}
+
+
 
 		//Misc::drawSprite("rpg_textures", "rpg_tracked", menuX, menuY, 0.025 + sizeX, 0.04f + sizeY, 45, 255, 255, 255, 230);
 
@@ -437,6 +468,15 @@ void foodCore(int cold_core, float menuX, float menuY, float sizeX, float sizeY)
 	}
 }
 
+int number_of_drinks = 0;
+
+float drinks_pee_drop;
+
+float drinks_pee_drop1 = GetPrivateProfileInt("CORES", "PEE_CORE_RATE_DRINKS1", 15, ".\\needs.ini") / 10;
+float drinks_pee_drop2 = GetPrivateProfileInt("CORES", "PEE_CORE_RATE_DRINKS2", 20, ".\\needs.ini") / 10;
+float drinks_pee_drop3 = GetPrivateProfileInt("CORES", "PEE_CORE_RATE_DRINKS3", 30, ".\\needs.ini") / 10;
+
+
 
 void peeCore(int cold_core, float menuX, float menuY, float sizeX, float sizeY, bool extend)
 {
@@ -461,11 +501,44 @@ void peeCore(int cold_core, float menuX, float menuY, float sizeX, float sizeY, 
 
 
 		if (!extend || !core_adjustment) {
-			Misc::drawSprite("rpg_textures", "rpg_tracked", menuX - 0.0015, menuY, 0.03 + sizeX, 0.043f + sizeY, 0, 255, 255, 255, 230);
+			if (number_of_drinks < 4) {
+				Misc::drawSprite("rpg_textures", "rpg_tracked", menuX - 0.0015, menuY, 0.03 + sizeX, 0.043f + sizeY, 0, 255, 255, 255, 230);
+				drinks_pee_drop = drinks_pee_drop1;
+			}
+			if (number_of_drinks >= 4 && number_of_drinks < 7) {
+				Misc::drawSprite("rpg_textures", "rpg_tracked", menuX - 0.0015, menuY, 0.03 + sizeX, 0.043f + sizeY, 0, 255, 255, 0, 230);
+				drinks_pee_drop = drinks_pee_drop1;
+			}
+			if (number_of_drinks >= 7 && number_of_drinks < 9) {
+				Misc::drawSprite("rpg_textures", "rpg_tracked", menuX - 0.0015, menuY, 0.03 + sizeX, 0.043f + sizeY, 0, 229, 148, 0, 230);
+				drinks_pee_drop = drinks_pee_drop2;
+			}
+			if (number_of_drinks >= 9) {
+				Misc::drawSprite("rpg_textures", "rpg_tracked", menuX - 0.0015, menuY, 0.03 + sizeX, 0.043f + sizeY, 0, 250, 0, 80, 230);
+				drinks_pee_drop = drinks_pee_drop3;
+			}
+
 
 		}
 		else {
-			Misc::drawSprite("rpg_textures", "rpg_tracked", menuX, menuY, 0.03 + sizeX, 0.043f + sizeY, 0, 255, 255, 255, 230);
+			if (number_of_drinks < 4) {
+				Misc::drawSprite("rpg_textures", "rpg_tracked", menuX, menuY, 0.03 + sizeX, 0.043f + sizeY, 0, 255, 255, 255, 230);
+				drinks_pee_drop = drinks_pee_drop1;
+			}
+			if (number_of_drinks >= 4 && number_of_drinks < 7) {
+				Misc::drawSprite("rpg_textures", "rpg_tracked", menuX, menuY, 0.03 + sizeX, 0.043f + sizeY, 0, 255, 255, 0, 230);
+				drinks_pee_drop = drinks_pee_drop1;
+			}
+			if (number_of_drinks >= 7 && number_of_drinks < 9) {
+				Misc::drawSprite("rpg_textures", "rpg_tracked", menuX, menuY, 0.03 + sizeX, 0.043f + sizeY, 0, 229, 148, 0, 230);
+				drinks_pee_drop = drinks_pee_drop2;
+			}
+			if (number_of_drinks >= 9) {
+				Misc::drawSprite("rpg_textures", "rpg_tracked", menuX, menuY, 0.03 + sizeX, 0.043f + sizeY, 0, 250, 0, 80, 230);
+				drinks_pee_drop = drinks_pee_drop3;
+			}
+
+			
 
 		}
 		
@@ -535,7 +608,7 @@ void drinkCore(int cold_core, float menuX, float menuY, float sizeX, float sizeY
 					temperature_drink_drop = temperature_drink_drop1;
 				}
 
-				if (getTemperaturePointsNeeded() == 2.5) {
+				if (getTemperaturePointsNeeded() <= 2.5) {
 					Misc::drawSprite("rpg_textures", "rpg_confusion", menuX + 0.0047f, menuY + 0.007f, 0.0165 + sizeX, 0.027f + sizeY, 0, 255, 255, 0, 230);
 					temperature_drink_drop = temperature_drink_drop1;
 				}
@@ -549,7 +622,7 @@ void drinkCore(int cold_core, float menuX, float menuY, float sizeX, float sizeY
 					temperature_drink_drop = temperature_drink_drop2;
 				}
 
-				if (getTemperaturePointsNeeded() == 2.5) {
+				if (getTemperaturePointsNeeded() <= 2.5) {
 					Misc::drawSprite("rpg_textures", "rpg_confusion", menuX + 0.0047f, menuY + 0.007f, 0.0165 + sizeX, 0.027f + sizeY, 0, 250, 0, 80, 230);
 					temperature_drink_drop = temperature_drink_drop3;
 				}
@@ -1431,7 +1504,7 @@ void main()
 	ifstream LoadFile;
 	LoadFile.open("needs.dat", std::ofstream::in);
 
-	LoadFile >> canteen >> food_core >> drink_core >> piss_core >> sleep_core >> canteen_type;
+	LoadFile >> canteen >> food_core >> drink_core >> piss_core >> sleep_core >> canteen_type >> number_of_drinks;
 
 	LoadFile.close();
 
@@ -1440,7 +1513,7 @@ void main()
 	ofstream SaveFile;
 	SaveFile.open("needs.dat", std::ofstream::trunc);
 
-	SaveFile << canteen << " " << food_core << " " << drink_core << " " << piss_core << " " << sleep_core << " " << canteen_type;
+	SaveFile << canteen << " " << food_core << " " << drink_core << " " << piss_core << " " << sleep_core << " " << canteen_type << " " << number_of_drinks << " ";
 
 	SaveFile.close();
 
@@ -1464,7 +1537,7 @@ void main()
 
 	int DropPromptTimer = 0;
 
-
+	int drinksTimer = 0;
 
 	while (true)
 	{
@@ -1704,15 +1777,23 @@ void main()
 			}
 
 			if (current_water < last_timer) {
-				drink_core = 100;
-			}
-
-
-			if (drink_core < 98) {
-				if (TASK::_GET_ITEM_INTERACTION_FROM_PED(player) == 788082563 || TASK::_GET_ITEM_INTERACTION_FROM_PED(player) == 3946734674) {
+				if (drink_core < 98) {
+					number_of_drinks++;
 					drink_core = 100;
 				}
 			}
+
+
+			//if (drink_core < 98) {
+				if (TASK::_GET_ITEM_INTERACTION_FROM_PED(player) == 788082563 || TASK::_GET_ITEM_INTERACTION_FROM_PED(player) == 3946734674) {
+					if (drinksTimer < MISC::GET_GAME_TIMER()) {
+						number_of_drinks++;
+
+						drink_core = 100;
+						drinksTimer = MISC::GET_GAME_TIMER() + 2000;
+					}
+				}
+			//}
 
 
 			save_timer++;
@@ -1723,7 +1804,7 @@ void main()
 				ofstream SaveFile;
 				SaveFile.open("needs.dat", std::ofstream::trunc);
 
-				SaveFile << canteen << " " << food_core << " " << drink_core << " " << piss_core << " " << sleep_core << " " << canteen_type;
+				SaveFile << canteen << " " << food_core << " " << drink_core << " " << piss_core << " " << sleep_core << " " << canteen_type << " " << number_of_drinks << " ";
 
 				SaveFile.close();
 				save_timer = 0;
@@ -2395,6 +2476,7 @@ void main()
 					GRAPHICS::ANIMPOSTFX_PLAY("PlayerRPGEmptyCoreDeadEye");
 
 					piss_core = 100;
+					number_of_drinks = 0;
 				}
 			}
 			else {
@@ -2437,7 +2519,7 @@ void main()
 
 			if (food_on) {
 				food_drop_timer++;
-				if (food_drop_timer > 60 * food_drop)
+				if (food_drop_timer > 120 * (food_drop / temperature_food_drop))
 				{
 					if (food_core > 0) {
 						food_core--;
@@ -2451,7 +2533,7 @@ void main()
 			if (drink_on) {
 				drink_drop_timer++;
 
-				if (drink_drop_timer > 60 * (drink_drop / temperature_drink_drop)) {
+				if (drink_drop_timer > 120 * (drink_drop / temperature_drink_drop)) {
 
 					if (drink_core > 0) {
 						drink_core--;
@@ -2465,7 +2547,7 @@ void main()
 
 			if (piss_on) {
 				pee_drop_timer++;
-				if (pee_drop_timer > 60 * piss_drop) {
+				if (pee_drop_timer > 120 * (piss_drop / drinks_pee_drop)) {
 
 					if (pissing == 0) {
 						if (piss_core > 0) {
@@ -2755,6 +2837,7 @@ void main()
 
 			if (isPlayerBathing()) {
 				piss_core = 100;
+				number_of_drinks = 0;
 			}
 			if (catalog_mode) {
 				if (drink_core > 98) {
@@ -3015,7 +3098,9 @@ void main()
 						
 						if (piss_core < 100) {
 							piss_core += 5;
-
+							if (number_of_drinks > 1) {
+								number_of_drinks--;
+							}
 
 						}
 						if (piss_core >= 100) {

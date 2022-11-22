@@ -7,6 +7,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BaseDataFile.cpp" />
+    <ClCompile Include="DataFiles.cpp" />
+    <ClCompile Include="DictDataFile.cpp" />
     <ClCompile Include="F:\rdr2 modding main\Core\samples\NativeTrainer\keyboard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math.cpp" />
@@ -17,6 +20,9 @@
     <ClInclude Include="..\..\inc\main.h" />
     <ClInclude Include="..\..\inc\natives.h" />
     <ClInclude Include="..\..\inc\types.h" />
+    <ClInclude Include="BaseDataFile.h" />
+    <ClInclude Include="DataFiles.h" />
+    <ClInclude Include="DictDataFile.h" />
     <ClInclude Include="F:\rdr2 modding main\Core\inc\enums.h" />
     <ClInclude Include="F:\rdr2 modding main\Core\inc\MinHook\MinHook.h" />
     <ClInclude Include="F:\rdr2 modding main\Core\inc\nativeCaller.h" />

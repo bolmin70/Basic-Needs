@@ -6,12 +6,17 @@
 
 #pragma once
 
+
 #include "..\..\inc\natives.h"
 #include "..\..\inc\types.h"
 #include "..\..\inc\enums.h"
 #include "..\..\inc\keyboard.h"
 #include "Math.h"
 #include "..\..\inc\main.h"
+
+#include "DataFiles.h"
+#include "DictDataFile.h"
+#include "BaseDataFile.h"
 
 #include <windows.h>
 #include <Mmsystem.h>
@@ -29,5 +34,18 @@
 #include <Psapi.h>
 #include <timeapi.h>
 #include <time.h>
+
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <memory>
+#include <functional>
+#include <iostream>
+
+#include <iostream>
+#include <iterator>
+#include <map>
+
+using namespace std;
 
 void ScriptMain();

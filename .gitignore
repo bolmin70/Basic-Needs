@@ -41,3 +41,5 @@
 *.ipdb
 *.tlog
 *.pdb
+samples/.vs/Needs/v16/.suo
+samples/needs/tmp/Release/Needs.vcxproj.FileListAbsolute.txt

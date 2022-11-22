@@ -4,6 +4,7 @@
 #include <vector>
 #include "Misc.h"
 #include "sstream"
+#include "DataFiles.h"
 
 using namespace std;
 
@@ -30,34 +31,48 @@ Prompt Prompt_Drop;
 
 bool alt_control = GetPrivateProfileInt("MISC", "ALTERNATIVE_HOLSTER_KEY", 0, ".\\needs.ini");
 
+const char* stopPrompt;
+const char* drinkPrompt;
+const char* washPrompt;
+const char* refillPrompt;
+const char* drinkCanteenPrompt;
+const char* urinatePrompt;
+const char* backPrompt;
+const char* sleepPrompt;
+const char* hr2Prompt;
+const char* hr4Prompt;
+const char* hr8Prompt;
+const char* upPrompt;
+
+
 void initialize()
 {
 
 	Misc::createPrompt(Prompt_Boil, "INPUT_DUCK", "Boil Water", 0, 1754796591);
 
-	Misc::createPrompt(Prompt_Stop, "INPUT_FRONTEND_CANCEL", "Stop", 0);
+	Misc::createPrompt(Prompt_Stop, "INPUT_FRONTEND_CANCEL", stopPrompt, 0);
 
-	Misc::createPrompt(Prompt_Drink, "INPUT_SHOP_BUY", "Drink", 0);
+	Misc::createPrompt(Prompt_Drink, "INPUT_SHOP_BUY", drinkPrompt, 0);
 
-	Misc::createPrompt(Prompt_Wash, "INPUT_JUMP", "Wash yourself", 0);
+	Misc::createPrompt(Prompt_Wash, "INPUT_JUMP", washPrompt, 0);
 
-	Misc::createPrompt(Prompt_Fill, "INPUT_SPRINT", "Refill Canteen", 0);
+	Misc::createPrompt(Prompt_Fill, "INPUT_SPRINT", refillPrompt, 0);
 
-	Misc::createPrompt(Prompt_Drink_Flask, "INPUT_FRONTEND_ACCEPT", "Drink from canteen", 2);
+	Misc::createPrompt(Prompt_Drink_Flask, "INPUT_FRONTEND_ACCEPT", drinkCanteenPrompt, 2);
 
-	Misc::createPrompt(Prompt_Pee, "INPUT_INTERACT_LOCKON_POS", "Urinate", 2, 704572841);
+	Misc::createPrompt(Prompt_Pee, "INPUT_INTERACT_LOCKON_POS", urinatePrompt, 2, 704572841);
 
-	Misc::createPrompt(Prompt_Back, "INPUT_FRONTEND_CANCEL", "Back", 0);
+	Misc::createPrompt(Prompt_Back, "INPUT_FRONTEND_CANCEL", backPrompt, 0);
 
-	Misc::createPrompt(Prompt_Sleep, "INPUT_FRONTEND_ACCEPT", "Sleep", 2, 342152817);
+	Misc::createPrompt(Prompt_Sleep, "INPUT_FRONTEND_ACCEPT", sleepPrompt, 2, 342152817);
 
-	Misc::createPrompt(Prompt_Nap1, "INPUT_SHOP_BUY", "2 Hour Nap", 2, 1323335645);
+	Misc::createPrompt(Prompt_Nap1, "INPUT_SHOP_BUY", hr2Prompt, 2, 1323335645);
 
-	Misc::createPrompt(Prompt_Nap2, "INPUT_JUMP", "4 Hour Nap", 2, 1323335645);
+	Misc::createPrompt(Prompt_Nap2, "INPUT_JUMP", hr4Prompt, 2, 1323335645);
 
-	Misc::createPrompt(Prompt_Nap3, "INPUT_SPRINT", "8 Hour Nap", 2, 1323335645);
+	Misc::createPrompt(Prompt_Nap3, "INPUT_SPRINT", hr8Prompt, 2, 1323335645);
 
-	Misc::createPrompt(Prompt_Leave, "INPUT_FRONTEND_CANCEL", "Get Up", 0);
+	Misc::createPrompt(Prompt_Leave, "INPUT_FRONTEND_CANCEL", upPrompt, 0);
 	
 	Misc::createPrompt(Prompt_Drop, "INPUT_FRONTEND_CANCEL", "Drop Weapon", 0);
 
@@ -1238,6 +1253,20 @@ void removeItemFromPedInventory(Ped ped, int itemHash, const char* name, const c
 
 void main()
 {		
+	DataFiles::load();
+
+	stopPrompt = DataFiles::Lang->get("prompts.stop");
+	drinkPrompt = DataFiles::Lang->get("prompts.drink");
+	washPrompt = DataFiles::Lang->get("prompts.wash");
+	refillPrompt = DataFiles::Lang->get("prompts.refill");
+	drinkCanteenPrompt = DataFiles::Lang->get("prompts.drinkCanteen");
+	urinatePrompt = DataFiles::Lang->get("prompts.urinate");
+	backPrompt = DataFiles::Lang->get("prompts.back");
+	sleepPrompt = DataFiles::Lang->get("prompts.sleep");
+	hr2Prompt = DataFiles::Lang->get("prompts.2hr");
+	hr4Prompt = DataFiles::Lang->get("prompts.4hr");
+	hr8Prompt = DataFiles::Lang->get("prompts.8hr");
+	upPrompt = DataFiles::Lang->get("prompts.getUp");
 
 
 	int food_drop = GetPrivateProfileInt("CORES", "FOOD_CORE_RATE", 1, ".\\needs.ini");
@@ -1538,6 +1567,9 @@ void main()
 	int DropPromptTimer = 0;
 
 	int drinksTimer = 0;
+	Vector3 playerPos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true, false);
+
+	//EVENT::ADD_SHOCKING_EVENT_AT_POSITION(MISC::GET_HASH_KEY("EVENT_SHOCKING_VISIBLE_REACTION"), playerPos.x, playerPos.y, playerPos.z, 0, 0, 0, 0, 0, 0, 0);
 
 	while (true)
 	{

@@ -44,6 +44,13 @@ const char* hr4Prompt;
 const char* hr8Prompt;
 const char* upPrompt;
 
+const char* walkPrompt;
+const char* runPrompt;
+
+const char* fullCanteenPrompt;
+const char* notThirstyPrompt;
+const char* canteenEmptyPrompt;
+
 
 void initialize()
 {
@@ -1260,6 +1267,12 @@ void main()
 	washPrompt = DataFiles::Lang->get("prompts.wash");
 	refillPrompt = DataFiles::Lang->get("prompts.refill");
 	drinkCanteenPrompt = DataFiles::Lang->get("prompts.drinkCanteen");
+
+	fullCanteenPrompt = DataFiles::Lang->get("prompts.fullCanteenPrompt");
+	notThirstyPrompt = DataFiles::Lang->get("prompts.notThirstyPrompt");
+	canteenEmptyPrompt = DataFiles::Lang->get("prompts.canteenEmptyPrompt");
+
+
 	urinatePrompt = DataFiles::Lang->get("prompts.urinate");
 	backPrompt = DataFiles::Lang->get("prompts.back");
 	sleepPrompt = DataFiles::Lang->get("prompts.sleep");
@@ -1267,6 +1280,9 @@ void main()
 	hr4Prompt = DataFiles::Lang->get("prompts.4hr");
 	hr8Prompt = DataFiles::Lang->get("prompts.8hr");
 	upPrompt = DataFiles::Lang->get("prompts.getUp");
+	
+	walkPrompt = DataFiles::Lang->get("prompts.walkPrompt");
+	runPrompt = DataFiles::Lang->get("prompts.runPrompt");
 
 
 	int food_drop = GetPrivateProfileInt("CORES", "FOOD_CORE_RATE", 1, ".\\needs.ini");
@@ -1928,10 +1944,10 @@ void main()
 				//PED::SET_PED_MAX_MOVE_BLEND_RATIO(PLAYER::PLAYER_PED_ID(), 1.4f);
 
 				if (force_walk) {
-					HUD::_UIPROMPT_SET_TEXT(Prompt_Walk, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Sprint"));
+					HUD::_UIPROMPT_SET_TEXT(Prompt_Walk, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", runPrompt));
 				}
 				else {
-					HUD::_UIPROMPT_SET_TEXT(Prompt_Walk, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Walk"));
+					HUD::_UIPROMPT_SET_TEXT(Prompt_Walk, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", walkPrompt));
 				}
 
 				if (!INTERIOR::IS_INTERIOR_SCENE() && !PED::IS_PED_IN_COMBAT(player, 0) && Misc::getCurrentPlayerWeapon() == MISC::GET_HASH_KEY("WEAPON_UNARMED")) {
@@ -2898,32 +2914,32 @@ void main()
 
 					
 					if (catalog_mode) {
-						if (INVENTORY::_0xE787F05DFC977BDE(1, MISC::GET_HASH_KEY("CONSUMABLE_GIN_USED"), 0) == 4) {
-							HUD::_UIPROMPT_SET_TEXT(Prompt_Fill, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Your canteen is full")); //set text
+						if (INVENTORY::_0xE787F05DFC977BDE(1, MISC::GET_HASH_KEY("CONSUMABLE_GIN_USED"), 0) == 4) {//Your canteen is full
+							HUD::_UIPROMPT_SET_TEXT(Prompt_Fill, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", fullCanteenPrompt)); //your canteen is full
 							HUD::_UIPROMPT_SET_ENABLED(Prompt_Fill, 0); // _UIPROMPT_SET_ENABLED
 						}
-						else {
-							HUD::_UIPROMPT_SET_TEXT(Prompt_Fill, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Refill canteen")); //set text
+						else { 
+							HUD::_UIPROMPT_SET_TEXT(Prompt_Fill, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", refillPrompt)); //Refill canteen
 							HUD::_UIPROMPT_SET_ENABLED(Prompt_Fill, 1); // _UIPROMPT_SET_ENABLED
 						}
 
 					}
 					else {
 						if (canteen == 4) {
-							HUD::_UIPROMPT_SET_TEXT(Prompt_Fill, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Your canteen is full")); //set text
+							HUD::_UIPROMPT_SET_TEXT(Prompt_Fill, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", fullCanteenPrompt)); //set text
 							HUD::_UIPROMPT_SET_ENABLED(Prompt_Fill, 0); // _UIPROMPT_SET_ENABLED
 						}
 						else {
-							HUD::_UIPROMPT_SET_TEXT(Prompt_Fill, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Refill canteen")); //set text
+							HUD::_UIPROMPT_SET_TEXT(Prompt_Fill, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", refillPrompt)); //set text
 							HUD::_UIPROMPT_SET_ENABLED(Prompt_Fill, 1); // _UIPROMPT_SET_ENABLED
 						}
 					}
 					if (drink_core > 98) {
-						HUD::_UIPROMPT_SET_TEXT(Prompt_Drink, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "You are not thirsty")); //set text
+						HUD::_UIPROMPT_SET_TEXT(Prompt_Drink, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", notThirstyPrompt)); //You are not thirsty
 						HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink, 0); // _UIPROMPT_SET_ENABLED
 					}
 					else {
-						HUD::_UIPROMPT_SET_TEXT(Prompt_Drink, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Drink")); //set text
+						HUD::_UIPROMPT_SET_TEXT(Prompt_Drink, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", drinkPrompt)); //Drink
 						HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink, 1); // _UIPROMPT_SET_ENABLED
 					}
 
@@ -3048,11 +3064,11 @@ void main()
 
 
 							if (drink_core > 98) {
-								HUD::_UIPROMPT_SET_TEXT(Prompt_Drink_Flask, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "You are not thirsty")); //set text
+								HUD::_UIPROMPT_SET_TEXT(Prompt_Drink_Flask, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", notThirstyPrompt)); //set text
 								HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink_Flask, 0); // _UIPROMPT_SET_ENABLED
 							}
 							else {
-								HUD::_UIPROMPT_SET_TEXT(Prompt_Drink_Flask, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Drink from canteen")); //set text
+								HUD::_UIPROMPT_SET_TEXT(Prompt_Drink_Flask, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", drinkCanteenPrompt)); //Drink from canteen
 								HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink_Flask, 1); // _UIPROMPT_SET_ENABLED
 							}
 
@@ -3061,7 +3077,7 @@ void main()
 
 						}
 						else {
-							HUD::_UIPROMPT_SET_TEXT(Prompt_Drink_Flask, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Canteen is empty")); //set text
+							HUD::_UIPROMPT_SET_TEXT(Prompt_Drink_Flask, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", canteenEmptyPrompt)); //Canteen is empty
 							HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink_Flask, 0); // _UIPROMPT_SET_ENABLED
 						}
 					}

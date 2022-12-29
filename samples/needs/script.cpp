@@ -51,6 +51,7 @@ const char* fullCanteenPrompt;
 const char* notThirstyPrompt;
 const char* canteenEmptyPrompt;
 
+const char* survivalMenuTitle;
 
 void initialize()
 {
@@ -61,7 +62,7 @@ void initialize()
 
 	Misc::createPrompt(Prompt_Drink, "INPUT_SHOP_BUY", drinkPrompt, 0);
 
-	Misc::createPrompt(Prompt_Wash, "INPUT_JUMP", washPrompt, 0);
+	Misc::createPrompt(Prompt_Wash, "INPUT_INTERACT_LOCKON_POS", washPrompt, 0);
 
 	Misc::createPrompt(Prompt_Fill, "INPUT_SPRINT", refillPrompt, 0);
 
@@ -69,7 +70,7 @@ void initialize()
 
 	Misc::createPrompt(Prompt_Pee, "INPUT_INTERACT_LOCKON_POS", urinatePrompt, 2, 704572841);
 
-	Misc::createPrompt(Prompt_Back, "INPUT_FRONTEND_CANCEL", backPrompt, 0);
+	Misc::createPrompt(Prompt_Back, "INPUT_INTERACT_LOCKON_NEG", backPrompt, 1);
 
 	Misc::createPrompt(Prompt_Sleep, "INPUT_FRONTEND_ACCEPT", sleepPrompt, 2, 342152817);
 
@@ -91,7 +92,7 @@ void initialize()
 		Misc::createPrompt(Prompt_Holster, "INPUT_DUCK", "Holster Off-Hand", 0);
 	}
 
-	Misc::createPrompt(Prompt_Walk, "INPUT_SHOP_BUY", "Sprint", 2);
+	Misc::createPrompt(Prompt_Walk, "INPUT_SHOP_BUY", "Survival Menu", 2);
 
 	//704572841
 
@@ -593,6 +594,8 @@ float temperature_drink_drop3 = GetPrivateProfileInt("CORES", "DRINK_CORE_RATE_T
 
 
 bool no_slowdown = GetPrivateProfileInt("MISC", "SLOWDOWN", 1, ".\\needs.ini");
+bool survival_menu_old = GetPrivateProfileInt("MISC", "OLD_SURVIVAL_MENU", 0, ".\\needs.ini");
+
 
 
 
@@ -899,7 +902,7 @@ int coat_weight = GetPrivateProfileInt("CORES", "COAT_WEIGHT", 10, ".\\needs.ini
 
 int global_weight;
 
-bool simplify_weight = GetPrivateProfileInt("CORES", "SIMPLIFIED_WEIGHT", 1, ".\\needs.ini");
+bool simplify_weight = 0;
 
 void weightCore(int cold_core, float menuX, float menuY, float sizeX, float sizeY)
 {
@@ -1073,15 +1076,19 @@ void weightCore(int cold_core, float menuX, float menuY, float sizeX, float size
 			weight += 20;
 		}
 	}
+	
+	//weight += 30;
+
+
 	cold_core = weight;
 
 	global_weight = weight;
 
-
+	//weight += 30;
 
 	if (weight_timer < MISC::GET_GAME_TIMER()) {
 		if (!PED::IS_PED_ON_MOUNT(PLAYER::PLAYER_PED_ID()) && !PED::IS_PED_ON_VEHICLE(PLAYER::PLAYER_PED_ID(), 1)) {
-			weight += 30;
+			
 			if (weight >= 0 && weight < 40) {
 
 				ATTRIBUTE::SET_ATTRIBUTE_BASE_RANK(PLAYER::PLAYER_PED_ID(), 1, currentStaminaLevel);
@@ -1161,6 +1168,7 @@ void weightCore(int cold_core, float menuX, float menuY, float sizeX, float size
 				Misc::drawSprite("rpg_textures", "rpg_overweight", menuX + 0.0001, menuY, 0.025 + sizeX, 0.04f + sizeY, 0, 255, 255, 255, 230);
 			}
 			else {
+				
 				if (weight >= 0 && weight < 40) {
 					Misc::drawSprite("rpg_textures", "rpg_overweight", menuX + 0.0001, menuY, 0.025 + sizeX, 0.04f + sizeY, 0, 255, 255, 255, 230);
 				}
@@ -1283,6 +1291,8 @@ void main()
 	
 	walkPrompt = DataFiles::Lang->get("prompts.walkPrompt");
 	runPrompt = DataFiles::Lang->get("prompts.runPrompt");
+
+	survivalMenuTitle = DataFiles::Lang->get("prompts.survivalMenuTitle");
 
 
 	int food_drop = GetPrivateProfileInt("CORES", "FOOD_CORE_RATE", 1, ".\\needs.ini");
@@ -1940,26 +1950,29 @@ void main()
 
 
 
-			if (PAD::IS_CONTROL_PRESSED(0, MISC::GET_HASH_KEY("INPUT_AIM"))) {
+			if (PAD::IS_CONTROL_PRESSED(0, MISC::GET_HASH_KEY("INPUT_INTERACT_LOCKON"))) {
 				//PED::SET_PED_MAX_MOVE_BLEND_RATIO(PLAYER::PLAYER_PED_ID(), 1.4f);
 
 				if (force_walk) {
-					HUD::_UIPROMPT_SET_TEXT(Prompt_Walk, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", runPrompt));
+					//HUD::_UIPROMPT_SET_TEXT(Prompt_Walk, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", runPrompt));
 				}
 				else {
-					HUD::_UIPROMPT_SET_TEXT(Prompt_Walk, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", walkPrompt));
+					//HUD::_UIPROMPT_SET_TEXT(Prompt_Walk, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", walkPrompt));
 				}
 
-				if (!INTERIOR::IS_INTERIOR_SCENE() && !PED::IS_PED_IN_COMBAT(player, 0) && Misc::getCurrentPlayerWeapon() == MISC::GET_HASH_KEY("WEAPON_UNARMED")) {
+				if (!INTERIOR::IS_INTERIOR_SCENE() && !PED::IS_PED_IN_COMBAT(player, 0) && Misc::getCurrentPlayerWeapon() == MISC::GET_HASH_KEY("WEAPON_UNARMED") && !pissing && !wash_on) {
 					if (!release) {
-						HUD::_UIPROMPT_SET_ENABLED(Prompt_Walk, 1);
-						HUD::_UIPROMPT_SET_VISIBLE(Prompt_Walk, 1);
+						//if (!survival_menu) {
+							HUD::_UIPROMPT_SET_ENABLED(Prompt_Walk, 1);
+							HUD::_UIPROMPT_SET_VISIBLE(Prompt_Walk, 1);
+						//}
 					}
 				}
 			}
 
 			if (HUD::_UIPROMPT_IS_JUST_RELEASED(Prompt_Walk)) {
-				force_walk = !force_walk;
+				//force_walk = !force_walk;
+				survival_menu = 1;
 			}
 
 			if (PED::IS_PED_IN_COMBAT(PLAYER::PLAYER_PED_ID(), 0)) {
@@ -2898,10 +2911,12 @@ void main()
 
 			if (survival_menu == 1) {
 
+				PED::SET_PED_MAX_MOVE_BLEND_RATIO(PLAYER::PLAYER_PED_ID(), 1.5f);
+
 				//HUD::_UIPROMPT_SET_GROUP(Prompt_Contribute, -2019190071, 0);
 				//HUD::_UIPROMPT_SET_GROUP(Prompt_Ledger, -2019190071, 0);
 				if (!wash_on && !pissing) {
-					HUD::_UIPROMPT_SET_ACTIVE_GROUP_THIS_FRAME(-2019190071, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Survival Menu"), 1, 0, 0, 0);
+					HUD::_UIPROMPT_SET_ACTIVE_GROUP_THIS_FRAME(-2019190071, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", survivalMenuTitle), 1, 0, 0, 0);
 				}
 
 
@@ -3164,22 +3179,22 @@ void main()
 				}
 			}
 
+			if (survival_menu_old) {
+				if (PAD::IS_CONTROL_PRESSED(0, MISC::GET_HASH_KEY("INPUT_FRONTEND_RS")) || IsKeyPressed(menu_key)) {
 
-			if (PAD::IS_CONTROL_PRESSED(0, MISC::GET_HASH_KEY("INPUT_FRONTEND_RS")) || IsKeyPressed(menu_key)) {
+					pee_press++;
+					if (pee_press > menu_time) {
+						survival_menu = 1;
 
-				pee_press++;
-				if (pee_press > menu_time) {
-					survival_menu = 1;
+						pee_press = 0;
 
+
+					}
+				}
+				else {
 					pee_press = 0;
-
-
 				}
 			}
-			else {
-				pee_press = 0;
-			}
-
 
 
 

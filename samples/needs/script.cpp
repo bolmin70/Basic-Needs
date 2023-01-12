@@ -68,7 +68,7 @@ void initialize()
 
 	Misc::createPrompt(Prompt_Drink_Flask, "INPUT_FRONTEND_ACCEPT", drinkCanteenPrompt, 2);
 
-	Misc::createPrompt(Prompt_Pee, "INPUT_INTERACT_LOCKON_POS", urinatePrompt, 2, 704572841);
+	Misc::createPrompt(Prompt_Pee, "INPUT_INTERACT_LOCKON_POS", urinatePrompt, 2);
 
 	Misc::createPrompt(Prompt_Back, "INPUT_INTERACT_LOCKON_NEG", backPrompt, 1);
 
@@ -1456,6 +1456,8 @@ void main()
 	bool catalog_mode = GetPrivateProfileInt("MISC", "CATALOG_MODE", 0, ".\\needs.ini");
 	
 	bool holster_on = GetPrivateProfileInt("MISC", "HOLSTER_OFFHAND_ON", 1, ".\\needs.ini");
+
+	bool compatibility_mode = GetPrivateProfileInt("MISC", "COMPATIBILITY_MODE", 0, ".\\needs.ini");
 
 	int save_timer = 0;
 
@@ -2911,12 +2913,18 @@ void main()
 
 			if (survival_menu == 1) {
 
+				PAD::DISABLE_CONTROL_ACTION(0, MISC::GET_HASH_KEY("INPUT_INTERACT_LOCKON"), 1);
+
 				PED::SET_PED_MAX_MOVE_BLEND_RATIO(PLAYER::PLAYER_PED_ID(), 1.5f);
+
+
 
 				//HUD::_UIPROMPT_SET_GROUP(Prompt_Contribute, -2019190071, 0);
 				//HUD::_UIPROMPT_SET_GROUP(Prompt_Ledger, -2019190071, 0);
 				if (!wash_on && !pissing) {
-					HUD::_UIPROMPT_SET_ACTIVE_GROUP_THIS_FRAME(-2019190071, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", survivalMenuTitle), 1, 0, 0, 0);
+					if (!compatibility_mode) {
+						HUD::_UIPROMPT_SET_ACTIVE_GROUP_THIS_FRAME(-2019190071, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", survivalMenuTitle), 1, 0, 0, 0);
+					}
 				}
 
 
@@ -2964,11 +2972,11 @@ void main()
 					HUD::_UIPROMPT_SET_VISIBLE(Prompt_Fill, 1);
 					HUD::_UIPROMPT_SET_VISIBLE(Prompt_Drink, 1);
 					HUD::_UIPROMPT_SET_VISIBLE(Prompt_Wash, 1);
-
-					HUD::_UIPROMPT_SET_GROUP(Prompt_Wash, -2019190071, 0);
-					HUD::_UIPROMPT_SET_GROUP(Prompt_Drink, -2019190071, 0);
-					HUD::_UIPROMPT_SET_GROUP(Prompt_Fill, -2019190071, 0);
-
+					if (!compatibility_mode) {
+						HUD::_UIPROMPT_SET_GROUP(Prompt_Wash, -2019190071, 0);
+						HUD::_UIPROMPT_SET_GROUP(Prompt_Drink, -2019190071, 0);
+						HUD::_UIPROMPT_SET_GROUP(Prompt_Fill, -2019190071, 0);
+					}
 				}
 				else {
 					HUD::_UIPROMPT_SET_ENABLED(Prompt_Fill, 0);
@@ -3099,10 +3107,10 @@ void main()
 					
 					HUD::_UIPROMPT_SET_VISIBLE(Prompt_Drink_Flask, 1);
 
-			
+					if (!compatibility_mode) {
 						HUD::_UIPROMPT_SET_GROUP(Prompt_Pee, -2019190071, 0);
 						HUD::_UIPROMPT_SET_GROUP(Prompt_Drink_Flask, -2019190071, 0);
-					
+					}
 
 
 				}
@@ -3116,8 +3124,9 @@ void main()
 
 				HUD::_UIPROMPT_SET_ENABLED(Prompt_Back, 1); // _UIPROMPT_SET_ENABLED
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Back, 1);
-				HUD::_UIPROMPT_SET_GROUP(Prompt_Back, -2019190071, 0);
-
+				if (!compatibility_mode) {
+					HUD::_UIPROMPT_SET_GROUP(Prompt_Back, -2019190071, 0);
+				}
 			}
 			else {
 				HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink_Flask, 0); // _UIPROMPT_SET_ENABLED

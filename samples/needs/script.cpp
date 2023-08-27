@@ -26,8 +26,14 @@ Prompt Prompt_Nap3;
 Prompt Prompt_Leave;
 Prompt Prompt_Holster;
 Prompt Prompt_Walk;
+Prompt Prompt_Walk2;
+Prompt Prompt_Outfit;
 
 Prompt Prompt_Drop;
+Prompt Prompt_Watch;
+Prompt Prompt_Vest;
+Prompt Prompt_Coat;
+
 
 bool alt_control = GetPrivateProfileInt("MISC", "ALTERNATIVE_HOLSTER_KEY", 0, ".\\needs.ini");
 
@@ -82,7 +88,7 @@ void initialize()
 
 	Misc::createPrompt(Prompt_Leave, "INPUT_FRONTEND_CANCEL", upPrompt, 0);
 	
-	Misc::createPrompt(Prompt_Drop, "INPUT_FRONTEND_CANCEL", "Drop Weapon", 0);
+	Misc::createPrompt(Prompt_Drop, "INPUT_SPECIAL_ABILITY", "Drop Weapon", 2, 704572841);
 
 
 	if (alt_control) {
@@ -92,7 +98,19 @@ void initialize()
 		Misc::createPrompt(Prompt_Holster, "INPUT_DUCK", "Holster Off-Hand", 0);
 	}
 
-	Misc::createPrompt(Prompt_Walk, "INPUT_SHOP_BUY", "Survival Menu", 2);
+	Misc::createPrompt(Prompt_Walk, "INPUT_SHOP_BUY", survivalMenuTitle, 2);
+
+	Misc::createPrompt(Prompt_Walk2, "INPUT_INTERACT_LOCKON_POS", "Walk", 2);
+
+	Misc::createPrompt(Prompt_Outfit, "INPUT_INTERACT_LOCKON_NEG", "Outfit", 2);
+
+
+	Misc::createPrompt(Prompt_Vest, "INPUT_INTERACT_ANIMAL", "Take off vest", 2);
+	Misc::createPrompt(Prompt_Coat, "INPUT_SPECIAL_ABILITY", "Take off coat", 2);
+	//Misc::createPrompt(Prompt_Watch, "INPUT_TOGGLE_HOLSTER", "Watch", 2, 704572841);
+
+
+
 
 	//704572841
 
@@ -1266,6 +1284,8 @@ void removeItemFromPedInventory(Ped ped, int itemHash, const char* name, const c
 
 }
 
+bool outfit_menu = 0;
+
 void main()
 {		
 	DataFiles::load();
@@ -1294,7 +1314,7 @@ void main()
 
 	survivalMenuTitle = DataFiles::Lang->get("prompts.survivalMenuTitle");
 
-
+	//core settings
 	int food_drop = GetPrivateProfileInt("CORES", "FOOD_CORE_RATE", 1, ".\\needs.ini");
 	int drink_drop = GetPrivateProfileInt("CORES", "DRINK_CORE_RATE", 1, ".\\needs.ini");
 	int piss_drop = GetPrivateProfileInt("CORES", "PISS_CORE_RATE", 1, ".\\needs.ini");
@@ -1308,133 +1328,89 @@ void main()
 
 	int piss_replenish = GetPrivateProfileInt("CORES", "PISS_CORE_REPLENISH", 120, ".\\needs.ini");
 
-
 	int food_damage_amount = GetPrivateProfileInt("CORES", "FOOD_CORE_DAMAGE", 2, ".\\needs.ini");
 	int drink_damage_amount = GetPrivateProfileInt("CORES", "DRINK_CORE_DAMAGE", 2, ".\\needs.ini");
 	int piss_damage_amount = GetPrivateProfileInt("CORES", "PISS_CORE_DAMAGE", 0, ".\\needs.ini");
 
+
+	//enable/disable cores
 	int food_on = GetPrivateProfileInt("CORES", "FOOD_ON", 1, ".\\needs.ini");
 	int drink_on = GetPrivateProfileInt("CORES", "DRINK_ON", 1, ".\\needs.ini");
 	int piss_on = GetPrivateProfileInt("CORES", "PISS_ON", 1, ".\\needs.ini");
 	int sleep_on = GetPrivateProfileInt("CORES", "SLEEP_ON", 1, ".\\needs.ini");
 	int weight_on = GetPrivateProfileInt("CORES", "WEIGHT_ON", 1, ".\\needs.ini");
 
+	/////////////////////////////////Core positions///////////////////////////////////
+
+	float negative_food_x = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_X", 0, ".\\needs.ini") / 1000;
+	float food_x = GetPrivateProfileInt("POSITION", "FOOD_CORE_X", 0, ".\\needs.ini") / 1000;
+
+	float negative_food_y = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float food_y = GetPrivateProfileInt("POSITION", "FOOD_CORE_Y", 0, ".\\needs.ini") / 1000;
+
+	float negative_food_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+	float food_x_size = GetPrivateProfileInt("POSITION", "FOOD_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+
+	float negative_food_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+	float food_y_size = GetPrivateProfileInt("POSITION", "FOOD_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
 
 
-	float negative_food_x = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_X", 0, ".\\needs.ini");
-	float food_x = GetPrivateProfileInt("POSITION", "FOOD_CORE_X", 0, ".\\needs.ini");
+	float negative_drink_x = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_X", 0, ".\\needs.ini") / 1000;
+	float drink_x = GetPrivateProfileInt("POSITION", "DRINK_CORE_X", 0, ".\\needs.ini") / 1000;
 
-	float negative_food_y = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_Y", 0, ".\\needs.ini");
-	float food_y = GetPrivateProfileInt("POSITION", "FOOD_CORE_Y", 0, ".\\needs.ini");
+	float negative_drink_y = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float drink_y = GetPrivateProfileInt("POSITION", "DRINK_CORE_Y", 0, ".\\needs.ini") / 1000;
 
-	float negative_food_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_X_SIZE", 0, ".\\needs.ini");
-	float food_x_size = GetPrivateProfileInt("POSITION", "FOOD_CORE_X_SIZE", 0, ".\\needs.ini");
+	float negative_drink_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+	float drink_x_size = GetPrivateProfileInt("POSITION", "DRINK_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
 
-	float negative_food_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_Y_SIZE", 0, ".\\needs.ini");
-	float food_y_size = GetPrivateProfileInt("POSITION", "FOOD_CORE_Y_SIZE", 0, ".\\needs.ini");
-
-
+	float negative_drink_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+	float drink_y_size = GetPrivateProfileInt("POSITION", "DRINK_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
 
 
-	float negative_drink_x = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_X", 0, ".\\needs.ini");
-	float drink_x = GetPrivateProfileInt("POSITION", "DRINK_CORE_X", 0, ".\\needs.ini");
+	float negative_piss_x = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_X", 0, ".\\needs.ini") / 1000;
+	float piss_x = GetPrivateProfileInt("POSITION", "PISS_CORE_X", 0, ".\\needs.ini") / 1000;
 
-	float negative_drink_y = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_Y", 0, ".\\needs.ini");
-	float drink_y = GetPrivateProfileInt("POSITION", "DRINK_CORE_Y", 0, ".\\needs.ini");
+	float negative_piss_y = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float piss_y = GetPrivateProfileInt("POSITION", "PISS_CORE_Y", 0, ".\\needs.ini") / 1000;
 
-	float negative_drink_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_X_SIZE", 0, ".\\needs.ini");
-	float drink_x_size = GetPrivateProfileInt("POSITION", "DRINK_CORE_X_SIZE", 0, ".\\needs.ini");
+	float negative_piss_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+	float piss_x_size = GetPrivateProfileInt("POSITION", "PISS_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
 
-	float negative_drink_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_Y_SIZE", 0, ".\\needs.ini");
-	float drink_y_size = GetPrivateProfileInt("POSITION", "DRINK_CORE_Y_SIZE", 0, ".\\needs.ini");
-
-
-
-	float negative_piss_x = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_X", 0, ".\\needs.ini");
-	float piss_x = GetPrivateProfileInt("POSITION", "PISS_CORE_X", 0, ".\\needs.ini");
-
-	float negative_piss_y = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_Y", 0, ".\\needs.ini");
-	float piss_y = GetPrivateProfileInt("POSITION", "PISS_CORE_Y", 0, ".\\needs.ini");
-
-	float negative_piss_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_X_SIZE", 0, ".\\needs.ini");
-	float piss_x_size = GetPrivateProfileInt("POSITION", "PISS_CORE_X_SIZE", 0, ".\\needs.ini");
-
-	float negative_piss_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_Y_SIZE", 0, ".\\needs.ini");
-	float piss_y_size = GetPrivateProfileInt("POSITION", "PISS_CORE_Y_SIZE", 0, ".\\needs.ini");
+	float negative_piss_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+	float piss_y_size = GetPrivateProfileInt("POSITION", "PISS_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
 
 
+	float negative_canteen_x = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_X", 0, ".\\needs.ini") / 1000;
+	float canteen_x = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_X", 0, ".\\needs.ini") / 1000;
+
+	float negative_canteen_y = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float canteen_y = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_Y", 0, ".\\needs.ini") / 1000;
+
+	float negative_canteen_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+	float canteen_x_size = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+
+	float negative_canteen_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+	float canteen_y_size = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
 
 
-	float negative_canteen_x = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_X", 0, ".\\needs.ini");
-	float canteen_x = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_X", 0, ".\\needs.ini");
+	float negative_weight_x = GetPrivateProfileInt("POSITION", "NEGATIVE_WEIGHT_CORE_X", 0, ".\\needs.ini") / 1000;
+	float weight_x = GetPrivateProfileInt("POSITION", "WEIGHT_CORE_X", 0, ".\\needs.ini") / 1000;
 
-	float negative_canteen_y = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_Y", 0, ".\\needs.ini");
-	float canteen_y = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_Y", 0, ".\\needs.ini");
+	float negative_weight_y = GetPrivateProfileInt("POSITION", "NEGATIVE_WEIGHT_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float weight_y = GetPrivateProfileInt("POSITION", "WEIGHT_CORE_Y", 0, ".\\needs.ini") / 1000;
 
-	float negative_canteen_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_X_SIZE", 0, ".\\needs.ini");
-	float canteen_x_size = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_X_SIZE", 0, ".\\needs.ini");
+	float negative_sleep_x = GetPrivateProfileInt("POSITION", "NEGATIVE_SLEEP_CORE_X", 0, ".\\needs.ini") / 1000;
+	float sleep_x = GetPrivateProfileInt("POSITION", "SLEEP_CORE_X", 0, ".\\needs.ini") / 1000;
 
-	float negative_canteen_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_Y_SIZE", 0, ".\\needs.ini");
-	float canteen_y_size = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_Y_SIZE", 0, ".\\needs.ini");
-
-
+	float negative_sleep_y = GetPrivateProfileInt("POSITION", "NEGATIVE_SLEEP_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float sleep_y = GetPrivateProfileInt("POSITION", "SLEEP_CORE_Y", 0, ".\\needs.ini") / 1000;
 
 
-	float negative_weight_x = GetPrivateProfileInt("POSITION", "NEGATIVE_WEIGHT_CORE_X", 0, ".\\needs.ini");
-	float weight_x = GetPrivateProfileInt("POSITION", "WEIGHT_CORE_X", 0, ".\\needs.ini");
-
-	float negative_weight_y = GetPrivateProfileInt("POSITION", "NEGATIVE_WEIGHT_CORE_Y", 0, ".\\needs.ini");
-	float weight_y = GetPrivateProfileInt("POSITION", "WEIGHT_CORE_Y", 0, ".\\needs.ini");
-
-
-
-
-	float negative_sleep_x = GetPrivateProfileInt("POSITION", "NEGATIVE_SLEEP_CORE_X", 0, ".\\needs.ini");
-	float sleep_x = GetPrivateProfileInt("POSITION", "SLEEP_CORE_X", 0, ".\\needs.ini");
-
-	float negative_sleep_y = GetPrivateProfileInt("POSITION", "NEGATIVE_SLEEP_CORE_Y", 0, ".\\needs.ini");
-	float sleep_y = GetPrivateProfileInt("POSITION", "SLEEP_CORE_Y", 0, ".\\needs.ini");
-
-	food_x /= 1000;
-	food_y /= 1000;
-
-	drink_x /= 1000;
-	drink_y /= 1000;
-
-	piss_x /= 1000;
-	piss_y /= 1000;
-
-	canteen_x /= 1000;
-	canteen_y /= 1000;
-
-	sleep_x /= 1000;
-	sleep_y /= 1000;
-
-	weight_x /= 1000;
-	weight_y /= 1000;
-
-
-
-	negative_food_x /= 1000;
-	negative_food_y /= 1000;
-
-	negative_drink_x /= 1000;
-	negative_drink_y /= 1000;
-
-	negative_piss_x /= 1000;
-	negative_piss_y /= 1000;
-
-	negative_canteen_x /= 1000;
-	negative_canteen_y /= 1000;
-
-
-	negative_sleep_x /= 1000;
-	negative_sleep_y /= 1000;
-
-	negative_weight_x /= 1000;
-	negative_weight_y /= 1000;
-
-
+	
+	/////////////////////////////////End of core positions///////////////////////////////////
+	
+	//misc ini stuff
 	int menu_time = GetPrivateProfileInt("MISC", "MENU_TIME", 180, ".\\needs.ini");
 	int menu_key = GetPrivateProfileInt("MISC", "MENU_KEY", 80, ".\\needs.ini");
 
@@ -1459,19 +1435,16 @@ void main()
 
 	bool compatibility_mode = GetPrivateProfileInt("MISC", "COMPATIBILITY_MODE", 0, ".\\needs.ini");
 
-	int save_timer = 0;
 
+
+	int save_timer = 0;
 
 	int piss_timer = 0;
 
-
 	int consume_timer = 0;
-
 
 	int wash_timer = 0;
 	int wash_on = 0;
-
-
 
 	int start_anim = 0;
 	int drink_anim_timer = 0;
@@ -1479,13 +1452,11 @@ void main()
 	int start_pissing = 0;
 	int piss_anim_timer = 0;
 
-
 	bool drink_anim = 0;
 
 	bool drink_empty_anim = 0;
 	bool hunger_empty_anim = 0;
 	bool sleep_empty_anim = 0;
-
 
 	bool extend_hud = 0;
 
@@ -1493,8 +1464,6 @@ void main()
 
 	int hunger_anim = 0;
 	int sleep_anim = 0;
-
-
 
 	int weight_core = 0;
 
@@ -1582,8 +1551,6 @@ void main()
 	currentHealthLevel = ATTRIBUTE::GET_ATTRIBUTE_BASE_RANK(PLAYER::PLAYER_PED_ID(), 0);
 
 
-	//WORLD_HUMAN_BARTENDER_BEER
-
 	int water_timer;
 	int last_timer;
 	bool testdiscard = false;
@@ -1597,14 +1564,17 @@ void main()
 	int drinksTimer = 0;
 	Vector3 playerPos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true, false);
 
-	//EVENT::ADD_SHOCKING_EVENT_AT_POSITION(MISC::GET_HASH_KEY("EVENT_SHOCKING_VISIBLE_REACTION"), playerPos.x, playerPos.y, playerPos.z, 0, 0, 0, 0, 0, 0, 0);
+	int holsterTimer = 0;
 
+	Hash Weapon1 = 0;
+	Hash Weapon2 = 0;
 	while (true)
 	{
 		Ped player = PLAYER::PLAYER_PED_ID();
 		Vector3 playerPos = ENTITY::GET_ENTITY_COORDS(player, true, false);
 		Ped playerHorse = PLAYER::_GET_SADDLE_HORSE_FOR_PLAYER(0);
-
+		
+		//hide all prompts
 		HUD::_UIPROMPT_SET_ENABLED(Prompt_Sleep, 1);
 		HUD::_UIPROMPT_SET_VISIBLE(Prompt_Sleep, 1);
 
@@ -1626,35 +1596,21 @@ void main()
 		HUD::_UIPROMPT_SET_ENABLED(Prompt_Walk, 0);
 		HUD::_UIPROMPT_SET_VISIBLE(Prompt_Walk, 0);
 
-		
-		if (IsKeyPressed(VK_KEY_0)) {
-			
-		}
+		HUD::_UIPROMPT_SET_ENABLED(Prompt_Walk2, 0);
+		HUD::_UIPROMPT_SET_VISIBLE(Prompt_Walk2, 0);
 
-		//Entity testEntity;
-		//testEntity = PED::_0x4D0D2E3D8BC000EB(player, "p_bottleBeer01x_PH_R_HAND", 1);
+		HUD::_UIPROMPT_SET_ENABLED(Prompt_Outfit, 0);
+		HUD::_UIPROMPT_SET_VISIBLE(Prompt_Outfit, 0);
 
-		//stringstream item_interaction;
-		
-		//item_interaction << TASK::_GET_ITEM_INTERACTION_FROM_PED(player);
+		HUD::_UIPROMPT_SET_ENABLED(Prompt_Coat, 0);
+		HUD::_UIPROMPT_SET_VISIBLE(Prompt_Coat, 0);
 
-		//"ADD_REASON_DEFAULT"
+		HUD::_UIPROMPT_SET_ENABLED(Prompt_Vest, 0);
+		HUD::_UIPROMPT_SET_VISIBLE(Prompt_Vest, 0);
 
-		//Misc::showSubtitle(item_interaction.str().c_str());
+		PED::SET_AI_WEAPON_DAMAGE_MODIFIER(2.0f); //personal tweak
 
-		//INVENTORY::_INVENTORY_ADD_ITEM_WITH_GUID(playerID, DOCUMENT_SILTWATER_MOONSHINE_DISTILLERY_DEED, INVENTORY::INVENTORY_GET_GUID_FROM_ITEMID())
-
-
-		
-		
-	
-			//const b1 = new ArrayBuffer(8 * 12);
-			//const a2 = new DataView(b1);
-
-			//const b2 = new ArrayBuffer(8 * 12);
-			//const a3 = new DataView(b2);
-
-			 
+		//Structs for item interactions 
 		struct a1
 		{
 			alignas(8) int unk1 = 0;
@@ -1690,35 +1646,22 @@ void main()
 		a1 b1;
 		a2 b2;
 
-		//INVENTORY::_0xCB5D11F9508A928D(1, (Any*)&b1, (Any*)&b2, MISC::GET_HASH_KEY("UPGRADE_STAMINA_TANK_1"), 1084182731, 1, 752097756);
-
-
 		
-		HUD::_UIPROMPT_SET_ENABLED(Prompt_Drop, 0);
-		HUD::_UIPROMPT_SET_VISIBLE(Prompt_Drop, 0);
-		/*
-		if (PAD::IS_CONTROL_PRESSED(0, MISC::GET_HASH_KEY("INPUT_FRONTEND_CANCEL")) && WEAPON::_IS_WEAPON_TWO_HANDED(Misc::getCurrentPlayerWeapon())) {
-			DropPromptTimer += 1;
-			
-
-		}
-		if (!PED::IS_PED_STOPPED(player)) {
-			DropPromptTimer = 0;
-		}
+		HUD::_UIPROMPT_SET_ENABLED(Prompt_Drop, 1);
+		HUD::_UIPROMPT_SET_VISIBLE(Prompt_Drop, 1);
 		
-		if (DropPromptTimer >= 60 && PED::IS_PED_STOPPED(player)) {
-			HUD::_UIPROMPT_SET_ENABLED(Prompt_Drop, 1);
-			HUD::_UIPROMPT_SET_VISIBLE(Prompt_Drop, 1);
-			
+		if (WEAPON::_IS_WEAPON_TWO_HANDED(Misc::getCurrentPlayerWeapon()))
+		{
+			HUD::_UIPROMPT_SET_TEXT(Prompt_Drop, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Drop Weapon"));
+
 		}
 		else {
-			//DropPromptTimer = 0;
-			HUD::_UIPROMPT_SET_ENABLED(Prompt_Drop, 0);
-			HUD::_UIPROMPT_SET_VISIBLE(Prompt_Drop, 0);
+			HUD::_UIPROMPT_SET_TEXT(Prompt_Drop, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Watch"));
+
 		}
 
-		if (HUD::_UIPROMPT_HAS_HOLD_MODE_COMPLETED(Prompt_Drop)) {
-			DropPromptTimer = 0;
+		if (HUD::_UIPROMPT_IS_JUST_RELEASED(Prompt_Drop)) {
+			
 		
 				if (WEAPON::_IS_WEAPON_TWO_HANDED(Misc::getCurrentPlayerWeapon()))
 				{
@@ -1727,8 +1670,6 @@ void main()
 
 					STREAMING::REQUEST_ANIM_DICT("mech_inventory@discard@fallback@base@longarms@idle");
 					STREAMING::REQUEST_ANIM_DICT("mech_inventory@discard@fallback@base_crouch@longarms@idle");
-
-
 
 
 
@@ -1742,12 +1683,10 @@ void main()
 					}
 
 
+				}
+				else {
 
-
-
-
-
-
+					TASK::_TASK_ITEM_INTERACTION(PLAYER::PLAYER_PED_ID(), MISC::GET_HASH_KEY("KIT_PLAYER_POCKETWATCH"), MISC::GET_HASH_KEY("POCKET_WATCH_INSPECT_UNHOLSTER"), 1, 0, -1082130432 /* Float: -1f */);
 				}
 
 
@@ -1755,7 +1694,7 @@ void main()
 			
 		}
 		
-			if ((ENTITY::_GET_ENTITY_ANIM_CURRENT_TIME(player, "mech_inventory@discard@fallback@base@longarms@idle", "discard") > (0.14)) || (ENTITY::_GET_ENTITY_ANIM_CURRENT_TIME(player, "mech_inventory@discard@fallback@base_crouch@longarms@idle", "discard") > (0.14)))
+		if ((ENTITY::_GET_ENTITY_ANIM_CURRENT_TIME(player, "mech_inventory@discard@fallback@base@longarms@idle", "discard") > (0.14)) || (ENTITY::_GET_ENTITY_ANIM_CURRENT_TIME(player, "mech_inventory@discard@fallback@base_crouch@longarms@idle", "discard") > (0.14)))
 			{
 				WEAPON::_0xCEF4C65DE502D367(player, 1, 0, 0, 0);
 				TASK::STOP_ANIM_TASK(player, "mech_inventory@discard@fallback@base@longarms@idle", "discard", 1.0);
@@ -1763,71 +1702,10 @@ void main()
 
 			}
 			
-			*/
-			//STREAMING::REQUEST_ANIM_DICT("mech_weapons_longarms@loco@arthur@normal@rifle@idle");
 
+		if (during_missions == 1 || MISC::GET_MISSION_FLAG() == 0) { //disable during missions
 
-			/*
-			if (PED::IS_PED_STOPPED(PLAYER::PLAYER_PED_ID()))
-			{
-
-				if ((MISC::GET_GAME_TIMER() >= TestTimer) && (MISC::GET_GAME_TIMER() <= TestTimer))
-				{
-					if (TASK::_GET_ITEM_INTERACTION_FROM_PED(player) == 0)
-					{
-						_NAMESPACE29::_0x0EABF182FBB63D72(PLAYER::PLAYER_PED_ID(), 1, 1);
-					}
-				}
-
-
-				if (!ENTITY::IS_ENTITY_PLAYING_ANIM(PLAYER::PLAYER_PED_ID(), "mech_weapons_longarms@loco@arthur@normal@rifle@idle", "idle_mainhand_vertical", 0) && ((MISC::GET_GAME_TIMER() >= TestTimer) && (MISC::GET_GAME_TIMER() <= TestTimer + 50)))
-				{
-
-					TASK::TASK_PLAY_ANIM(PLAYER::PLAYER_PED_ID(), "mech_weapons_longarms@loco@arthur@normal@rifle@idle", "idle_mainhand_vertical", 1.0, 1, -1, 32, -1, 0, 0, 1, 0, 1);
-
-
-
-				}
-			}
-			else
-			{
-				TestTimer = MISC::GET_GAME_TIMER() + 5000;
-
-
-
-			}
-			*/
-
-
-
-
-
-
-
-
-
-		if (during_missions == 1 || MISC::GET_MISSION_FLAG() == 0) {
-
-			if (IsKeyPressed(VK_KEY_0)) {
-				//INVENTORY::_0xCB5D11F9508A928D(1, (Any*)&b1, (Any*)&b2, MISC::GET_HASH_KEY("UPGRADE_STAMINA_TANK_1"), 1084182731, 1, 752097756);
-				//INVENTORY::_0xCB5D11F9508A928D(1, (Any*)&b1, (Any*)&b2, MISC::GET_HASH_KEY("UPGRADE_HEALTH_TANK_1"), 1084182731, 1, 752097756);
-				//INVENTORY::_0xCB5D11F9508A928D(1, (Any*)&b1, (Any*)&b2, MISC::GET_HASH_KEY("UPGRADE_DEADEYE_TANK_1"), 1084182731, 1, 752097756);
-
-				//DOCUMENT_SILTWATER_MOONSHINE_DISTILLERY_DEED
-				//INVENTORY::_0xCB5D11F9508A928D(1, (Any*)&b1, (Any*)&b2, MISC::GET_HASH_KEY("CONSUMABLE_GIN_USED"), MISC::GET_HASH_KEY("SLOTID_WEAPON_0"), 1, 752097756);
-
-				/*
-				PED::CLEAR_PED_ENV_DIRT(player);
-				PED::CLEAR_PED_BLOOD_DAMAGE(player);
-				GRAPHICS::REMOVE_DECALS_IN_RANGE(playerPos.x, playerPos.y, playerPos.z, 5.f);
-				//removeItemFromPedInventory(player, MISC::GET_HASH_KEY("CONSUMABLE_GIN"), "Water", "inventory_items");
-				PED::CLEAR_PED_DAMAGE_DECAL_BY_ZONE(player, 10, "ALL");
-
-				PED::SET_PED_WETNESS_HEIGHT(player, 10.f);
-				*/
-			}
 			
-
 			int current_water = INVENTORY::_0xE787F05DFC977BDE(1, MISC::GET_HASH_KEY("CONSUMABLE_GIN_USED"), 0);
 
 			if (water_timer < MISC::GET_GAME_TIMER()) {
@@ -1843,9 +1721,7 @@ void main()
 				}
 			}
 
-
-			//if (drink_core < 98) {
-				if (TASK::_GET_ITEM_INTERACTION_FROM_PED(player) == 788082563 || TASK::_GET_ITEM_INTERACTION_FROM_PED(player) == 3946734674) {
+			if (TASK::_GET_ITEM_INTERACTION_FROM_PED(player) == 788082563 || TASK::_GET_ITEM_INTERACTION_FROM_PED(player) == 3946734674) {
 					if (drinksTimer < MISC::GET_GAME_TIMER()) {
 						number_of_drinks++;
 
@@ -1853,8 +1729,7 @@ void main()
 						drinksTimer = MISC::GET_GAME_TIMER() + 2000;
 					}
 				}
-			//}
-
+			
 
 			save_timer++;
 			if (save_timer >= 60) {
@@ -1869,7 +1744,6 @@ void main()
 				SaveFile.close();
 				save_timer = 0;
 			}
-
 		
 
 			if (HUD::_UIPROMPT_IS_JUST_RELEASED(Prompt_Sleep)) {
@@ -1929,11 +1803,8 @@ void main()
 
 
 			if (sitting) {
-
 				HUD::_UIPROMPT_SET_ENABLED(Prompt_Leave, 1);
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Leave, 1);
-
-
 
 				if (PAD::IS_DISABLED_CONTROL_PRESSED(0, MISC::GET_HASH_KEY("INPUT_MOVE_LR") || PAD::IS_DISABLED_CONTROL_PRESSED(0, MISC::GET_HASH_KEY("INPUT_MOVE_UD")))) {
 					TASK::CLEAR_PED_TASKS(player, 1, 0);
@@ -1951,15 +1822,13 @@ void main()
 			}
 
 
-
 			if (PAD::IS_CONTROL_PRESSED(0, MISC::GET_HASH_KEY("INPUT_INTERACT_LOCKON"))) {
-				//PED::SET_PED_MAX_MOVE_BLEND_RATIO(PLAYER::PLAYER_PED_ID(), 1.4f);
-
+			
 				if (force_walk) {
-					//HUD::_UIPROMPT_SET_TEXT(Prompt_Walk, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", runPrompt));
+					HUD::_UIPROMPT_SET_TEXT(Prompt_Walk2, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", runPrompt));
 				}
 				else {
-					//HUD::_UIPROMPT_SET_TEXT(Prompt_Walk, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", walkPrompt));
+					HUD::_UIPROMPT_SET_TEXT(Prompt_Walk2, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", walkPrompt));
 				}
 
 				if (!INTERIOR::IS_INTERIOR_SCENE() && !PED::IS_PED_IN_COMBAT(player, 0) && Misc::getCurrentPlayerWeapon() == MISC::GET_HASH_KEY("WEAPON_UNARMED") && !pissing && !wash_on) {
@@ -1967,6 +1836,14 @@ void main()
 						//if (!survival_menu) {
 							HUD::_UIPROMPT_SET_ENABLED(Prompt_Walk, 1);
 							HUD::_UIPROMPT_SET_VISIBLE(Prompt_Walk, 1);
+
+							if (!PED::IS_PED_ON_MOUNT(player)) {
+								HUD::_UIPROMPT_SET_ENABLED(Prompt_Walk2, 1);
+								HUD::_UIPROMPT_SET_VISIBLE(Prompt_Walk2, 1);
+							}
+
+							HUD::_UIPROMPT_SET_ENABLED(Prompt_Outfit, 1);
+							HUD::_UIPROMPT_SET_VISIBLE(Prompt_Outfit, 1);
 						//}
 					}
 				}
@@ -1977,6 +1854,18 @@ void main()
 				survival_menu = 1;
 			}
 
+			if (HUD::_UIPROMPT_IS_JUST_RELEASED(Prompt_Walk2)) {
+				force_walk = !force_walk;
+				//survival_menu = 1;
+			}
+
+			if (HUD::_UIPROMPT_IS_JUST_RELEASED(Prompt_Outfit)) {
+				outfit_menu = 1;
+			}
+
+
+
+
 			if (PED::IS_PED_IN_COMBAT(PLAYER::PLAYER_PED_ID(), 0)) {
 				force_walk = 0;
 			}
@@ -1986,6 +1875,7 @@ void main()
 			}
 
 			Vector3 horsePos = ENTITY::GET_ENTITY_COORDS(playerHorse, 1, 0);
+			//small experiment with disabling dual wielding
 			if (WEAPON::GET_ALLOW_DUAL_WIELD(player)) {
 				Entity ent;
 				if (PLAYER::IS_PLAYER_TARGETTING_ANYTHING(0) && distanceBetween(playerPos, horsePos) <= 8.7f) {
@@ -2005,7 +1895,6 @@ void main()
 
 					}
 				}
-				//WEAPON::_SET_ALLOW_DUAL_WIELD(player, 0);
 				if (HUD::_UIPROMPT_HAS_HOLD_MODE_COMPLETED(Prompt_Holster)) {
 
 
@@ -2014,8 +1903,6 @@ void main()
 					TASK::TASK_ANIMAL_INTERACTION(player, playerHorse, MISC::GET_HASH_KEY("Interaction_HolsterRightPistol"), 0, 1);
 
 					weapon_timer = MISC::GET_GAME_TIMER() + 1000;
-
-					//WEAPON::_SET_ALLOW_DUAL_WIELD(player, !WEAPON::GET_ALLOW_DUAL_WIELD(player));
 
 					holster = 1;
 
@@ -2032,9 +1919,7 @@ void main()
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Holster, 0);
 			}
 
-		
-
-
+			//validation checks
 			if (drinking_walk) {
 				if (drink_core == 0) {
 
@@ -2217,11 +2102,6 @@ void main()
 
 			}
 
-
-
-
-
-			//foodCore(food_core);
 			if (food_core > food_core_max) {
 				food_core = food_core_max;
 			}
@@ -2249,13 +2129,8 @@ void main()
 			}
 
 
-			//WORLD_HUMAN_PEE
-
-
 			std::stringstream text;
-
-
-
+			//core size adjustment logic for revealing the HUD
 			if (GRAPHICS::ANIMPOSTFX_IS_RUNNING("WheelHUDIn") && PAD::IS_CONTROL_PRESSED(0, MISC::GET_HASH_KEY("INPUT_SELECT_RADAR_MODE"))) {
 				if (!inAlt) {
 					if (no_slowdown) {
@@ -2282,14 +2157,11 @@ void main()
 			}
 
 
-
-
-
 			if (extend_hud_timer < MISC::GET_GAME_TIMER()) {
 				extend_hud = 0;
 			}
 
-
+			//core extnesion when the weapon wheel is opened
 			if (PAD::IS_CONTROL_PRESSED(0, MISC::GET_HASH_KEY("INPUT_OPEN_WHEEL_MENU")) && GRAPHICS::ANIMPOSTFX_IS_RUNNING("WheelHUDIn")) {
 				extend_hud = 1;
 				inWheel = 1;
@@ -2321,6 +2193,7 @@ void main()
 
 			}
 
+			//core extension when satchel is openend
 			if (satchel_opened) {
 
 
@@ -2394,7 +2267,6 @@ void main()
 
 				}
 			}
-
 			if (weight_on) {
 
 
@@ -2415,9 +2287,6 @@ void main()
 
 				}
 			}
-
-
-
 			if (drink_on) {
 
 				
@@ -2435,67 +2304,7 @@ void main()
 
 			}
 			
-			if (HUD::IS_RADAR_HIDDEN() == true) {
-
-
-
-			}
-			else {
-				/*
-				if (!extend_hud) {
-
-				}
-				else {
-					float coreX = 0.205;
-					float coreY = 0.94;
-
-					Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_1", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_1", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) <= 10) {
-						Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_1", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) <= 20 && ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) > 10) {
-						Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_2", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) <= 30 && ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) > 20) {
-						Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_3", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) <= 50 && ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) > 30) {
-						Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_4", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) == 50) {
-						Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_5", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) <= 60 && ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) > 50) {
-						Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_6", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) <= 70 && ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) > 60) {
-						Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_7", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) <= 80 && ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) > 70) {
-						Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_8", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) <= 90 && ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) > 80) {
-						Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_9", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) > 90) {
-						Misc::drawSprite("rpg_menu_item_effects", "rpg_tank_10", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-
-
-
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) > 60) {
-						Misc::drawSprite("rpg_textures", "rpg_overweight", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-					if (ATTRIBUTE::GET_ATTRIBUTE_RANK(player, 13) <= 60) {
-						Misc::drawSprite("rpg_textures", "rpg_underweight", coreX, coreY, 0.03, 0.05, 0, 255, 255, 255, 255);
-					}
-
-
-				}
-				*/
-
-			}
+			
 
 
 			core_drop_timer++;
@@ -2519,14 +2328,6 @@ void main()
 			}
 
 
-
-
-
-
-
-
-	
-
 			if (piss_core == 0) {
 
 
@@ -2548,6 +2349,7 @@ void main()
 
 			is_night = 0;
 			is_running = 0;
+			//core accelaration logic for night and sprinting
 			if (CLOCK::GET_CLOCK_HOURS() >= 23 || CLOCK::GET_CLOCK_HOURS() < 5) {
 				is_night = 1;
 			}
@@ -2556,7 +2358,7 @@ void main()
 					is_running = 1;
 				}
 			}
-
+			//Core drop logic - using frame based timers, should be updated!
 			if (sleep_on) {
 
 				if (overpowerSleep) {
@@ -2624,23 +2426,6 @@ void main()
 			}
 
 
-	
-
-
-			/*
-			if (ATTRIBUTE::_GET_ATTRIBUTE_CORE_VALUE(player, 0) > 99) {
-				ATTRIBUTE::_SET_ATTRIBUTE_CORE_VALUE(player, 0, 95);
-			}
-			if (ATTRIBUTE::_GET_ATTRIBUTE_CORE_VALUE(player, 1) > 99) {
-				ATTRIBUTE::_SET_ATTRIBUTE_CORE_VALUE(player, 1, 95);
-			}
-			if (ATTRIBUTE::_GET_ATTRIBUTE_CORE_VALUE(player, 2) > 99) {
-				ATTRIBUTE::_SET_ATTRIBUTE_CORE_VALUE(player, 2, 95);
-			}
-			*/
-
-
-
 			food_timer++;
 			if (food_timer > 60) {
 
@@ -2652,11 +2437,6 @@ void main()
 
 				food_timer = 0;
 			}
-
-
-
-
-
 
 			consume_timer++;
 			if (consume_timer > 20) {
@@ -2738,7 +2518,7 @@ void main()
 										overpowerSleep = 1;
 										overpowerSleepTimer = MISC::GET_GAME_TIMER() + 60000 * 3;
 
-										drink_core = 100;
+										//drink_core = 100;
 										consume_timer = 0;
 										camp_eat_timer = MISC::GET_GAME_TIMER() + 5000;
 
@@ -2824,38 +2604,6 @@ void main()
 			}
 
 
-			if (canteen_type != 0) {
-
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Boil, 1);
-				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Boil, 1);
-			}
-			else {
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Boil, 0);
-				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Boil, 0);
-			}
-
-
-			if (HUD::_UIPROMPT_IS_JUST_RELEASED(Prompt_Boil) || HUD::_UIPROMPT_HAS_HOLD_MODE_COMPLETED(Prompt_Boil)) {
-				CAM::DO_SCREEN_FADE_OUT(10);
-
-
-
-				Misc::showSubtitle("Your water is clean");
-				canteen_type = 0;
-
-
-				WAIT(2000);
-
-				CAM::DO_SCREEN_FADE_IN(1);
-
-
-				TASK::CLEAR_PED_TASKS(player, 1, 1);
-				TASK::_TASK_START_SCENARIO_IN_PLACE(0, MISC::GET_HASH_KEY("WORLD_HUMAN_CROUCH_INSPECT"), 5000, true, true, 1, true);
-
-			}
-
-
-
 			if (HUD::_UIPROMPT_IS_JUST_RELEASED(Prompt_Drink) || HUD::_UIPROMPT_HAS_HOLD_MODE_COMPLETED(Prompt_Drink)) {
 
 				drink_core = 100;
@@ -2894,14 +2642,11 @@ void main()
 			}
 
 
-
-
-
-
 			if (isPlayerBathing()) {
 				piss_core = 100;
 				number_of_drinks = 0;
 			}
+			
 			if (catalog_mode) {
 				if (drink_core > 98) {
 					INVENTORY::_0x766315A564594401(1, MISC::GET_HASH_KEY("CONSUMABLE_GIN_USED"), 0);
@@ -2917,16 +2662,11 @@ void main()
 
 				PED::SET_PED_MAX_MOVE_BLEND_RATIO(PLAYER::PLAYER_PED_ID(), 1.5f);
 
-
-
-				//HUD::_UIPROMPT_SET_GROUP(Prompt_Contribute, -2019190071, 0);
-				//HUD::_UIPROMPT_SET_GROUP(Prompt_Ledger, -2019190071, 0);
 				if (!wash_on && !pissing) {
 					if (!compatibility_mode) {
 						HUD::_UIPROMPT_SET_ACTIVE_GROUP_THIS_FRAME(-2019190071, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", survivalMenuTitle), 1, 0, 0, 0);
 					}
 				}
-
 
 				if (ENTITY::IS_ENTITY_IN_WATER(player) == true) {
 					HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink_Flask, 0); // _UIPROMPT_SET_ENABLED
@@ -3122,38 +2862,97 @@ void main()
 				}
 
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Back, 1); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Back, 1); 
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Back, 1);
 				if (!compatibility_mode) {
 					HUD::_UIPROMPT_SET_GROUP(Prompt_Back, -2019190071, 0);
 				}
 			}
 			else {
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink_Flask, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink_Flask, 0);
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Drink_Flask, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Pee, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Pee, 0); 
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Pee, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Back, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Back, 0); 
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Back, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Fill, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Fill, 0);
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Fill, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink, 0);
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Drink, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Wash, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Wash, 0); 
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Wash, 0);
 
 			}
 
+			//show outfit customization menu - personal tweak
+			if (outfit_menu == 1) {
+
+				PAD::DISABLE_CONTROL_ACTION(0, MISC::GET_HASH_KEY("INPUT_INTERACT_LOCKON"), 1);
+
+				PED::SET_PED_MAX_MOVE_BLEND_RATIO(PLAYER::PLAYER_PED_ID(), 1.5f);
+
+				HUD::_UIPROMPT_SET_GROUP(Prompt_Back, -2019190071, 0);
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Back, 1);
+				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Back, 1);
+
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Coat, 1);
+				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Coat, 1);
+
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Vest, 1);
+				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Vest, 1);
 
 
-			if (wash_on == 1) {
+				HUD::_UIPROMPT_SET_ACTIVE_GROUP_THIS_FRAME(-2019190071, (char*)MISC::_CREATE_VAR_STRING(10, "LITERAL_STRING", "Outfit"), 1, 0, 0, 0);
 				
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Wash, 0); // _UIPROMPT_SET_ENABLED
+
+				HUD::_UIPROMPT_SET_GROUP(Prompt_Coat, -2019190071, 0);
+				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Coat, 1);
+				if (PED::_IS_PED_COMPONENT_EQUIPPED(player, 0xE06D30CE)) {
+					HUD::_UIPROMPT_SET_ENABLED(Prompt_Coat, 1);
+				}
+				else {
+					HUD::_UIPROMPT_SET_ENABLED(Prompt_Coat, 0);
+				}
+
+				if (HUD::_UIPROMPT_IS_JUST_RELEASED(Prompt_Coat)) {
+					PED::_SET_PED_COMPONENT_DISABLED(player, 0xE06D30CE, 0);
+					PED::_UPDATE_PED_VARIATION(player, 0, 1, 1, 1, 0);
+					PED::_0xCB9401F918CB0F75(player, "PlayUnequipGlovesFidget", true, 100);
+				}
+
+				HUD::_UIPROMPT_SET_GROUP(Prompt_Vest, -2019190071, 0);
+				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Vest, 1);
+				if (PED::_IS_PED_COMPONENT_EQUIPPED(player, 0x485EE834)) {
+					HUD::_UIPROMPT_SET_ENABLED(Prompt_Vest, 1);
+
+				}
+				else {
+					HUD::_UIPROMPT_SET_ENABLED(Prompt_Vest, 0);
+				}
+
+
+				if (HUD::_UIPROMPT_IS_JUST_RELEASED(Prompt_Vest)) {
+					PED::_SET_PED_COMPONENT_DISABLED(player, 0x485EE834, 0);
+					PED::_UPDATE_PED_VARIATION(player, 0, 1, 1, 1, 0);
+					PED::_0xCB9401F918CB0F75(player, "PlayUnequipGlovesFidget", true, 100);
+				}
+
+				if (HUD::_UIPROMPT_IS_JUST_RELEASED(Prompt_Back) || HUD::_UIPROMPT_HAS_HOLD_MODE_COMPLETED(Prompt_Back)) {
+
+					outfit_menu = 0;
+				}
+
+			}
+
+			//wash in water
+			if (wash_on) {
+				
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Wash, 0); 
 
 				wash_timer++;
 				if (wash_timer > 100) {
@@ -3162,7 +2961,7 @@ void main()
 				}
 			}
 
-
+			//start urinating after a delay
 			if (piss_anim_timer < MISC::GET_GAME_TIMER() && start_pissing) {
 				piss_timer++;
 				if (piss_timer > piss_replenish) {
@@ -3176,7 +2975,7 @@ void main()
 
 						}
 						if (piss_core >= 100) {
-							HUD::_UIPROMPT_SET_ENABLED(Prompt_Stop, 0); // _UIPROMPT_SET_ENABLED
+							HUD::_UIPROMPT_SET_ENABLED(Prompt_Stop, 0); 
 							HUD::_UIPROMPT_SET_VISIBLE(Prompt_Stop, 0);
 							pissing = 0;
 							TASK::CLEAR_PED_TASKS(player, 1, 1);
@@ -3187,7 +2986,7 @@ void main()
 					piss_timer = 0;
 				}
 			}
-
+			//previous version of the survival menu, launched on RS/R3, frequently didn't work for some reason
 			if (survival_menu_old) {
 				if (PAD::IS_CONTROL_PRESSED(0, MISC::GET_HASH_KEY("INPUT_FRONTEND_RS")) || IsKeyPressed(menu_key)) {
 
@@ -3206,12 +3005,8 @@ void main()
 			}
 
 
-
-
-
-
 			if (HUD::_UIPROMPT_HAS_HOLD_MODE_COMPLETED(Prompt_Stop)) {
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Stop, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Stop, 0); 
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Stop, 0);
 				pissing = 0;
 				wash_on = 0;
@@ -3223,7 +3018,7 @@ void main()
 				HUD::_UIPROMPT_SET_ENABLED(Prompt_Pee, 0);
 			}
 
-
+			//RDR2EE compatiblity
 			if (catalog_mode) {
 				HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink_Flask, 0); 
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Drink_Flask, 0);
@@ -3234,45 +3029,39 @@ void main()
 
 			}
 
-			//INTERIOR::IS_VALID_INTERIOR
-			//INTERIOR::GET_INTERIOR_AT_COORDS(playerPos);
-
-
-			//_GET_TEMPERATURE_AT_COORDS
-
 			
 		} else {
 
 				HUD::_UIPROMPT_SET_ENABLED(Prompt_Holster, 0);
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Holster, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink_Flask, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink_Flask, 0);
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Drink_Flask, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Pee, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Pee, 0);
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Pee, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Back, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Back, 0); 
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Back, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Stop, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Stop, 0); 
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Stop, 0);
 
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Fill, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Fill, 0);
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Fill, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Drink, 0); 
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Drink, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Wash, 0); // _UIPROMPT_SET_ENABLED
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Wash, 0); 
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Wash, 0);
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Sleep, 0); // _UIPROMPT_SET_ENABLED
-				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Sleep, 0); // _UIPROMPT_SET_VISIBLE
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Sleep, 0); 
+				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Sleep, 0); 
 
-				HUD::_UIPROMPT_SET_ENABLED(Prompt_Leave, 0); // _UIPROMPT_SET_ENABLED
-				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Leave, 0); // _UIPROMPT_SET_VISIBLE
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Leave, 0); 
+				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Leave, 0);
 
 				HUD::_UIPROMPT_SET_ENABLED(Prompt_Nap1, 0);
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Nap1, 0);
@@ -3283,7 +3072,17 @@ void main()
 				HUD::_UIPROMPT_SET_ENABLED(Prompt_Nap3, 0);
 				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Nap3, 0);
 
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Holster, 0);
+				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Holster, 0);
 
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Walk, 0);
+				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Walk, 0);
+
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Walk2, 0);
+				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Walk2, 0);
+
+				HUD::_UIPROMPT_SET_ENABLED(Prompt_Outfit, 0);
+				HUD::_UIPROMPT_SET_VISIBLE(Prompt_Outfit, 0);
 
 }
 

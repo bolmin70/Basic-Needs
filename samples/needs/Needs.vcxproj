@@ -7,16 +7,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\inc\keyboard.cpp" />
     <ClCompile Include="BaseDataFile.cpp" />
     <ClCompile Include="DataFiles.cpp" />
     <ClCompile Include="DictDataFile.cpp" />
-    <ClCompile Include="F:\rdr2 modding main\Core\samples\NativeTrainer\keyboard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="script.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\inc\keyboard.h" />
     <ClInclude Include="..\..\inc\main.h" />
     <ClInclude Include="..\..\inc\natives.h" />
     <ClInclude Include="..\..\inc\types.h" />
@@ -26,7 +27,6 @@
     <ClInclude Include="F:\rdr2 modding main\Core\inc\enums.h" />
     <ClInclude Include="F:\rdr2 modding main\Core\inc\MinHook\MinHook.h" />
     <ClInclude Include="F:\rdr2 modding main\Core\inc\nativeCaller.h" />
-    <ClInclude Include="F:\rdr2 modding main\Core\samples\NativeTrainer\keyboard.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="script.h" />
@@ -56,7 +56,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetExt>.asi</TargetExt>
-    <OutDir>G:\SteamLibrary\steamapps\common\Red Dead Redemption 2</OutDir>
+    <OutDir>G:\Red Dead Redemption 2 (dev)</OutDir>
     <IntDir>tmp\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

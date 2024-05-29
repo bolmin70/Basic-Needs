@@ -11,7 +11,7 @@ using namespace std;
 Prompt Prompt_Drink;
 Prompt Prompt_Wash;
 Prompt Prompt_Fill;
-Prompt Prompt_Boil;
+
 Prompt Prompt_Stop; 
 
 Prompt Prompt_Drink_Flask;
@@ -62,7 +62,6 @@ const char* survivalMenuTitle;
 void initialize()
 {
 
-	Misc::createPrompt(Prompt_Boil, "INPUT_DUCK", "Boil Water", 0, 1754796591);
 
 	Misc::createPrompt(Prompt_Stop, "INPUT_FRONTEND_CANCEL", stopPrompt, 0);
 
@@ -1342,69 +1341,69 @@ void main()
 
 	/////////////////////////////////Core positions///////////////////////////////////
 
-	float negative_food_x = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_X", 0, ".\\needs.ini") / 1000;
-	float food_x = GetPrivateProfileInt("POSITION", "FOOD_CORE_X", 0, ".\\needs.ini") / 1000;
+	float negative_food_x = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_X", 0, ".\\needs.ini") / 1000;
+	float food_x = (float)GetPrivateProfileInt("POSITION", "FOOD_CORE_X", 0, ".\\needs.ini") / 1000;
 
-	float negative_food_y = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_Y", 0, ".\\needs.ini") / 1000;
-	float food_y = GetPrivateProfileInt("POSITION", "FOOD_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float negative_food_y = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float food_y = (float)GetPrivateProfileInt("POSITION", "FOOD_CORE_Y", 0, ".\\needs.ini") / 1000;
 
-	float negative_food_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
-	float food_x_size = GetPrivateProfileInt("POSITION", "FOOD_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+	float negative_food_x_size = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+	float food_x_size = (float)GetPrivateProfileInt("POSITION", "FOOD_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
 
-	float negative_food_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
-	float food_y_size = GetPrivateProfileInt("POSITION", "FOOD_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
-
-
-	float negative_drink_x = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_X", 0, ".\\needs.ini") / 1000;
-	float drink_x = GetPrivateProfileInt("POSITION", "DRINK_CORE_X", 0, ".\\needs.ini") / 1000;
-
-	float negative_drink_y = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_Y", 0, ".\\needs.ini") / 1000;
-	float drink_y = GetPrivateProfileInt("POSITION", "DRINK_CORE_Y", 0, ".\\needs.ini") / 1000;
-
-	float negative_drink_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
-	float drink_x_size = GetPrivateProfileInt("POSITION", "DRINK_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
-
-	float negative_drink_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
-	float drink_y_size = GetPrivateProfileInt("POSITION", "DRINK_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+	float negative_food_y_size = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_FOOD_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+	float food_y_size = (float)GetPrivateProfileInt("POSITION", "FOOD_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
 
 
-	float negative_piss_x = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_X", 0, ".\\needs.ini") / 1000;
-	float piss_x = GetPrivateProfileInt("POSITION", "PISS_CORE_X", 0, ".\\needs.ini") / 1000;
+	float negative_drink_x = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_X", 0, ".\\needs.ini") / 1000;
+	float drink_x = (float)GetPrivateProfileInt("POSITION", "DRINK_CORE_X", 0, ".\\needs.ini") / 1000;
 
-	float negative_piss_y = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_Y", 0, ".\\needs.ini") / 1000;
-	float piss_y = GetPrivateProfileInt("POSITION", "PISS_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float negative_drink_y = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float drink_y = (float)GetPrivateProfileInt("POSITION", "DRINK_CORE_Y", 0, ".\\needs.ini") / 1000;
 
-	float negative_piss_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
-	float piss_x_size = GetPrivateProfileInt("POSITION", "PISS_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+	float negative_drink_x_size = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+	float drink_x_size = (float)GetPrivateProfileInt("POSITION", "DRINK_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
 
-	float negative_piss_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
-	float piss_y_size = GetPrivateProfileInt("POSITION", "PISS_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
-
-
-	float negative_canteen_x = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_X", 0, ".\\needs.ini") / 1000;
-	float canteen_x = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_X", 0, ".\\needs.ini") / 1000;
-
-	float negative_canteen_y = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_Y", 0, ".\\needs.ini") / 1000;
-	float canteen_y = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_Y", 0, ".\\needs.ini") / 1000;
-
-	float negative_canteen_x_size = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
-	float canteen_x_size = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
-
-	float negative_canteen_y_size = GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
-	float canteen_y_size = GetPrivateProfileInt("POSITION", "CANTEEN_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+	float negative_drink_y_size = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_DRINK_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+	float drink_y_size = (float)GetPrivateProfileInt("POSITION", "DRINK_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
 
 
-	float negative_weight_x = GetPrivateProfileInt("POSITION", "NEGATIVE_WEIGHT_CORE_X", 0, ".\\needs.ini") / 1000;
-	float weight_x = GetPrivateProfileInt("POSITION", "WEIGHT_CORE_X", 0, ".\\needs.ini") / 1000;
+	float negative_piss_x = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_X", 0, ".\\needs.ini") / 1000;
+	float piss_x = (float)GetPrivateProfileInt("POSITION", "PISS_CORE_X", 0, ".\\needs.ini") / 1000;
 
-	float negative_weight_y = GetPrivateProfileInt("POSITION", "NEGATIVE_WEIGHT_CORE_Y", 0, ".\\needs.ini") / 1000;
-	float weight_y = GetPrivateProfileInt("POSITION", "WEIGHT_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float negative_piss_y = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float piss_y = (float)GetPrivateProfileInt("POSITION", "PISS_CORE_Y", 0, ".\\needs.ini") / 1000;
 
-	float negative_sleep_x = GetPrivateProfileInt("POSITION", "NEGATIVE_SLEEP_CORE_X", 0, ".\\needs.ini") / 1000;
-	float sleep_x = GetPrivateProfileInt("POSITION", "SLEEP_CORE_X", 0, ".\\needs.ini") / 1000;
+	float negative_piss_x_size = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+	float piss_x_size = (float)GetPrivateProfileInt("POSITION", "PISS_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
 
-	float negative_sleep_y = GetPrivateProfileInt("POSITION", "NEGATIVE_SLEEP_CORE_Y", 0, ".\\needs.ini") / 1000;
-	float sleep_y = GetPrivateProfileInt("POSITION", "SLEEP_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float negative_piss_y_size = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_PISS_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+	float piss_y_size = (float)GetPrivateProfileInt("POSITION", "PISS_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+
+
+	float negative_canteen_x = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_X", 0, ".\\needs.ini") / 1000;
+	float canteen_x = (float)GetPrivateProfileInt("POSITION", "CANTEEN_CORE_X", 0, ".\\needs.ini") / 1000;
+
+	float negative_canteen_y = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float canteen_y = (float)GetPrivateProfileInt("POSITION", "CANTEEN_CORE_Y", 0, ".\\needs.ini") / 1000;
+
+	float negative_canteen_x_size = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+	float canteen_x_size = (float)GetPrivateProfileInt("POSITION", "CANTEEN_CORE_X_SIZE", 0, ".\\needs.ini") / 1000;
+
+	float negative_canteen_y_size = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_CANTEEN_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+	float canteen_y_size = (float)GetPrivateProfileInt("POSITION", "CANTEEN_CORE_Y_SIZE", 0, ".\\needs.ini") / 1000;
+
+
+	float negative_weight_x = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_WEIGHT_CORE_X", 0, ".\\needs.ini") / 1000;
+	float weight_x = (float)GetPrivateProfileInt("POSITION", "WEIGHT_CORE_X", 0, ".\\needs.ini") / 1000;
+
+	float negative_weight_y = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_WEIGHT_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float weight_y = (float)GetPrivateProfileInt("POSITION", "WEIGHT_CORE_Y", 0, ".\\needs.ini") / 1000;
+
+	float negative_sleep_x = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_SLEEP_CORE_X", 0, ".\\needs.ini") / 1000;
+	float sleep_x = (float)GetPrivateProfileInt("POSITION", "SLEEP_CORE_X", 0, ".\\needs.ini") / 1000;
+
+	float negative_sleep_y = (float)GetPrivateProfileInt("POSITION", "NEGATIVE_SLEEP_CORE_Y", 0, ".\\needs.ini") / 1000;
+	float sleep_y = (float)GetPrivateProfileInt("POSITION", "SLEEP_CORE_Y", 0, ".\\needs.ini") / 1000;
 
 
 	
@@ -1608,7 +1607,7 @@ void main()
 		HUD::_UIPROMPT_SET_ENABLED(Prompt_Vest, 0);
 		HUD::_UIPROMPT_SET_VISIBLE(Prompt_Vest, 0);
 
-		PED::SET_AI_WEAPON_DAMAGE_MODIFIER(2.0f); //personal tweak
+		//PED::SET_AI_WEAPON_DAMAGE_MODIFIER(2.0f); //personal tweak
 
 		//Structs for item interactions 
 		struct a1
